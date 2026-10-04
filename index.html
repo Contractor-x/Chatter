@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chatter</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="ash" id="ash" aria-hidden="true"></div>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">C</span>
+      <span class="brand-word">Chatter</span>
+    </div>
+
+    <button class="identity" id="identity" type="button">
+      <span class="identity-avatar" id="identityAvatar">S</span>
+      <span class="identity-name" id="identityName">SwiftOtter42</span>
+      <span class="identity-dot" id="identityDot"></span>
+    </button>
+
+    <p class="sidebar-label">Groups</p>
+
+    <nav class="groups" id="groups"></nav>
+
+    <button class="add-group" id="addGroup" type="button">
+      <span class="add-group-plus">+</span>
+      <span>Add group</span>
+    </button>
+  </aside>
+
+  <main class="chat">
+    <header class="chat-header">
+      <h1><span class="chat-hash">#</span><span id="chatTitle">ANIME</span></h1>
+      <p id="chatDescription">Anime talk, nothing more.</p>
+      <div class="chat-meta">
+        <span class="pill" id="pillOnline">1 online</span>
+      </div>
+    </header>
+
+    <div class="banner" id="banner" hidden></div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="composer">
+      <div class="composer-field" id="composerField">
+        <span class="composer-ring" id="composerRing"></span>
+        <span class="composer-caret" id="composerCaret"></span>
+        <div class="sparks" id="sparks" aria-hidden="true"></div>
+        <textarea id="input" rows="1" maxlength="300" placeholder="iMessage" autocomplete="off"></textarea>
+        <span class="composer-count" id="count">300</span>
+      </div>
+      <button class="send" id="send" type="button" disabled>Send</button>
+    </div>
+  </main>
+
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <h2 id="dialogTitle">New group</h2>
+    <input id="groupName" maxlength="40" placeholder="group-name" autocomplete="off">
+    <div class="dialog-actions">
+      <button class="btn-ghost" id="cancelGroup" type="button">Cancel</button>
+      <button class="btn-primary" id="createGroup" type="button" disabled>Create</button>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/anime.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
