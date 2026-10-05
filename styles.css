@@ -382,7 +382,10 @@ button {
   display: flex;
   align-items: baseline;
   gap: 9px;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
+}
+.msg.is-mine .msg-head {
+  justify-content: flex-end;
 }
 
 .msg-name {
@@ -588,7 +591,7 @@ button {
   display: flex;
   align-items: flex-end;
   gap: 12px;
-  padding: 13px 17px 15px;
+  padding: 11px 16px 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--raise);

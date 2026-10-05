@@ -194,11 +194,11 @@
         }
       ],
       duration: function () {
-        return rand(11000, 21000);
+        return rand(18000, 28000);
       },
-      delay: anime.stagger(rand(0, 1400)),
+      delay: anime.stagger(rand(400, 2400)),
       loop: true,
-      alternate: true,
+      alternate: false,
       easing: 'easeInOutSine'
     });
 
@@ -232,7 +232,7 @@
         }
       ],
       duration: function () {
-        return rand(14000, 26000);
+        return rand(24000, 38000);
       },
       delay: anime.stagger(900),
       loop: true,
@@ -306,7 +306,7 @@
     var main = el('div', 'msg-main');
 
     var head = el('div', 'msg-head');
-    head.appendChild(el('span', 'msg-name', mine ? 'You' : message.name));
+    if (!mine) head.appendChild(el('span', 'msg-name', message.name));
     var time = el('time', 'msg-time', clockOf(message.at));
     time.setAttribute('datetime', new Date(message.at).toISOString());
     head.appendChild(time);
@@ -321,14 +321,7 @@
     main.appendChild(el('p', 'msg-text', message.text));
     main.insertBefore(head, main.firstChild);
 
-    var actions = el('div', 'msg-actions');
-    var reply = el('button', 'reply-btn', 'Reply');
-    reply.type = 'button';
-    reply.addEventListener('click', function () {
-      startReply(message);
-    });
-    actions.appendChild(reply);
-    main.appendChild(actions);
+
 
     /* Order matters: .msg is `34px 1fr`, so the avatar must be the first
        grid child or auto-placement squeezes the body into the gutter. */
@@ -386,7 +379,9 @@
     });
 
     state.rendered[state.activeId] = messages.length;
-    host.scrollTop = host.scrollHeight;
+    setTimeout(function () {
+      host.scrollTo({ top: host.scrollHeight, behavior: 'smooth' });
+    }, 120);
   }
 
   /* ---------- reply ---------- */
@@ -487,7 +482,7 @@
   function autoGrow() {
     var input = $('input');
     input.style.height = 'auto';
-    input.style.height = Math.min(input.scrollHeight, 148) + 'px';
+    input.style.height = Math.min(input.scrollHeight, 96) + 'px';
   }
 
   function updateComposer() {
