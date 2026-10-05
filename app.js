@@ -505,7 +505,7 @@
     if (typing !== wasTyping) {
       anime({
         targets: field,
-        translateY: typing ? [0, -2] : [-2, 0],
+        translateY: typing ? [0, -1] : [-1, 0],
         borderRadius: typing ? ['14px', '19px'] : ['19px', '14px'],
         duration: typing ? 460 : 300,
         easing: typing ? 'spring(1, 78, 12, 0)' : 'easeOutQuad'

@@ -386,7 +386,17 @@ button {
 }
 .msg.is-mine .msg-head {
   justify-content: flex-end;
+  margin-bottom: 0;
 }
+.msg-time {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.1;
+}
+.msg.is-mine .msg-time {
+  text-align: right;
+}
+
 
 .msg-name {
   font-size: 13px;
