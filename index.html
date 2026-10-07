@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chatter</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="ash" id="ash" aria-hidden="true"></div>
+
+<div class="shell">
+
+  <aside class="rail">
+    <p class="wordmark">Chatter</p>
+
+    <button class="who" id="who" type="button" aria-label="Change your display name">
+      <span class="who-mark" id="whoMark">S</span>
+      <span class="who-name" id="whoName">SwiftOtter42</span>
+    </button>
+
+    <nav class="rail-groups" id="railGroups" aria-label="Groups"></nav>
+
+    <button class="add" id="add" type="button">
+      <span aria-hidden="true">+</span> Add group
+    </button>
+  </aside>
+
+  <main class="room">
+
+    <header class="room-head">
+      <div class="room-head-text">
+        <h1 id="roomName">ANIME</h1>
+        <p id="roomAbout">Anime talk, nothing more.</p>
+      </div>
+      <p class="room-tally" id="roomTally">5 here</p>
+    </header>
+
+    <div class="thread" id="thread" role="log" aria-live="polite" aria-label="Messages"></div>
+
+    <div class="dock">
+
+      <div class="replying" id="replying" hidden>
+        <span class="replying-rule" aria-hidden="true"></span>
+        <span class="replying-text">
+          <span class="replying-label" id="replyingLabel">Replying to Kuromi</span>
+          <span class="replying-body" id="replyingBody"></span>
+        </span>
+        <button class="replying-clear" id="replyingClear" type="button" aria-label="Cancel reply">Cancel</button>
+      </div>
+
+      <form class="composer" id="composer">
+        <div class="composer-field" id="composerField">
+          <span class="composer-fill" id="composerFill" aria-hidden="true"></span>
+          <span class="composer-rule" id="composerRule" aria-hidden="true"></span>
+          <textarea id="input" rows="1" maxlength="600" placeholder="Write something worth reading" autocomplete="off" aria-label="Message"></textarea>
+          <span class="composer-count" id="count">600</span>
+        </div>
+        <button class="send" id="send" type="submit" disabled>Send</button>
+      </form>
+
+    </div>
+
+  </main>
+
+</div>
+
+<div class="veil" id="groupVeil" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="groupVeilTitle">
+    <h2 id="groupVeilTitle">New group</h2>
+    <p class="sheet-note">Lowercase letters, numbers and dashes.</p>
+    <input id="groupInput" maxlength="40" placeholder="group-name" autocomplete="off">
+    <div class="sheet-actions">
+      <button class="ghost" id="groupCancel" type="button">Cancel</button>
+      <button class="solid" id="groupCreate" type="button" disabled>Create group</button>
+    </div>
+  </div>
+</div>
+
+<div class="veil" id="nameVeil" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="nameVeilTitle">
+    <h2 id="nameVeilTitle">Your display name</h2>
+    <p class="sheet-note">This is what people see when you argue.</p>
+    <input id="nameInput" maxlength="24" placeholder="display name" autocomplete="off">
+    <div class="sheet-actions">
+      <button class="ghost" id="nameCancel" type="button">Cancel</button>
+      <button class="solid" id="nameSave" type="button" disabled>Save name</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+
+<script src="vendor/anime.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

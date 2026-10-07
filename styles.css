@@ -1,0 +1,930 @@
+/* ============================================================
+   Chatter
+   1. Tokens
+   2. Reset
+   3. Ash layer
+   4. Shell + rail
+   5. Group list
+   6. Add group pill
+   7. Room header
+   8. Thread
+   9. Messages + quotes
+   10. Dock, reply strip, composer
+   11. Typing
+   12. Sheets + toast
+   13. Responsive
+   14. Reduced motion
+   ============================================================ */
+
+/* ---------- 1. Tokens ---------- */
+
+:root {
+  /* Chrome is monochrome on purpose. The only saturated colour in the
+     interface is author identity, which carries meaning. */
+  --void: #0a0a0b;
+  --raise: #131418;
+  --raise-2: #191a1f;
+  --ink: #e9e7e2;
+  --dim: #9a968d;   /* secondary text, and all text on raised surfaces: 6.2:1 */
+  --faint: #7d786f; /* meta text on the void: 4.5:1 */
+  --ghost: #55524c; /* decoration only. never carries text. */
+  --line: rgba(233, 231, 226, 0.085);
+  --line-strong: rgba(233, 231, 226, 0.19);
+
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Two widths on purpose: --measure is the centred column, --text-measure is
+     how far a line of prose actually runs. Arguments need a bounded measure,
+     not a full-bleed wall. */
+  --measure: 40rem;
+  --text-measure: 30rem;
+}
+
+/* ---------- 2. Reset ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ---------- 3. Ash layer ---------- */
+
+.ash {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mote {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 32%, #ffffff 0%, #b9b6ae 42%, #4a4844 100%);
+  will-change: transform, opacity;
+}
+
+.wisp {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(200, 196, 186, 0.42) 0%,
+    rgba(120, 118, 112, 0.14) 44%,
+    rgba(10, 10, 11, 0) 72%
+  );
+  filter: blur(54px);
+  will-change: transform, opacity, scale;
+}
+
+/* ---------- 4. Shell + rail ---------- */
+
+.shell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100%;
+}
+
+.rail {
+  width: 252px;
+  flex: 0 0 252px;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 18px 20px;
+  border-right: 1px solid var(--line);
+}
+
+.wordmark {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  padding-left: 2px;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin: 24px 0 22px;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.who:hover {
+  border-color: var(--line);
+  background: rgba(233, 231, 226, 0.03);
+}
+
+.who-mark {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--void);
+}
+
+.who-name {
+  font-size: 13.5px;
+  color: var(--dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 5. Group list ---------- */
+
+.rail-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-y: auto;
+}
+
+.group {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px 8px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--dim);
+  font-family: var(--serif);
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.16s ease, background 0.16s ease;
+}
+
+/* Active state is brightness and a bar, never hue. */
+.group::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2px;
+  height: 0;
+  margin-top: 0;
+  background: var(--ink);
+  transition: height 0.22s cubic-bezier(0.2, 0.9, 0.2, 1), margin-top 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.group:hover {
+  color: var(--ink);
+  background: rgba(233, 231, 226, 0.035);
+}
+
+.group.is-active {
+  color: var(--ink);
+}
+
+.group.is-active::before {
+  height: 17px;
+  margin-top: -8.5px;
+}
+
+.group-tally {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 6. Add group pill ---------- */
+
+.add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 15px 30px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: none;
+  color: var(--dim);
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.add:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+  background: rgba(233, 231, 226, 0.045);
+}
+
+.add span {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* ---------- 7. Room header ---------- */
+
+.room {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.room-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  max-width: calc(var(--measure) + 96px);
+  margin: 0 auto;
+  padding: 30px 48px 18px;
+}
+
+.room-head h1 {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  line-height: 1.1;
+}
+
+.room-head-text p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.room-tally {
+  flex: 0 0 auto;
+  padding-bottom: 5px;
+  font-size: 12.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- 8. Thread ---------- */
+
+.thread {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  max-width: calc(var(--measure) + 96px);
+  margin: 0 auto;
+  padding: 8px 48px 28px;
+  scroll-behavior: smooth;
+}
+
+/* ---------- 9. Messages + quotes ---------- */
+
+.day {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 26px 0 20px;
+  color: var(--faint);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+}
+
+.day::before,
+.day::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* Other people's messages sit on the page with no bubble at all, like a
+   printed transcript. Only your own get a surface. That inversion is the
+   whole point: it keeps the reading column calm. */
+.msg {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 13px;
+  margin-top: 20px;
+}
+
+.msg.is-first {
+  margin-top: 26px;
+}
+
+.msg-mark {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--void);
+}
+
+.msg-main {
+  min-width: 0;
+}
+
+.msg-head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 2px;
+}
+.msg.is-mine .msg-head {
+  justify-content: flex-end;
+  margin-bottom: 0;
+}
+.msg-time {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.1;
+}
+.msg.is-mine .msg-time {
+  text-align: right;
+}
+
+
+.msg-name {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+.msg-time {
+  font-size: 11.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.msg-text {
+  font-family: var(--serif);
+  font-size: 16.5px;
+  line-height: 1.58;
+  letter-spacing: 0.002em;
+  color: var(--dim);
+  max-width: var(--text-measure);
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+.msg.is-mine .msg-text {
+  color: var(--ink);
+}
+
+/* Your own words get the surface. Asymmetric radius encodes the side. */
+.msg.is-mine {
+  grid-template-columns: 1fr 34px;
+}
+
+.msg.is-mine .msg-main {
+  grid-column: 1;
+  justify-self: end;
+  max-width: 27rem;
+  padding: 13px 17px;
+  border: 1px solid var(--line);
+  border-radius: 4px 15px 15px 15px;
+  background: var(--raise);
+}
+
+.msg.is-mine .msg-mark {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.msg.is-mine .msg-text {
+  max-width: none;
+}
+
+.msg.is-mine.is-first .msg-main {
+  border-radius: 4px 15px 15px 15px;
+}
+
+/* The reply quote. This is the one deliberately loud element in the UI. */
+.quote {
+  margin: 0 0 8px;
+  padding: 1px 0 1px 13px;
+  border: 0;
+  border-left: 2px solid var(--line-strong);
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--dim);
+}
+
+.quote-name {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--dim);
+  margin-bottom: 1px;
+}
+
+.quote-text {
+  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.msg-actions {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.msg:hover .msg-actions,
+.msg:focus-within .msg-actions {
+  opacity: 1;
+}
+
+.reply-btn {
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--faint);
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.reply-btn:hover {
+  color: var(--ink);
+  background: rgba(233, 231, 226, 0.06);
+}
+
+.thread-empty {
+  margin: 64px 0;
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--faint);
+  text-align: center;
+}
+
+/* ---------- 10. Dock, reply strip, composer ---------- */
+
+.dock {
+  width: 100%;
+  max-width: calc(var(--measure) + 96px);
+  margin: 0 auto;
+  padding: 0 48px 26px;
+}
+
+.replying {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--raise);
+}
+
+.replying[hidden] {
+  display: none;
+}
+
+.replying-rule {
+  width: 2px;
+  align-self: stretch;
+  background: var(--line-strong);
+  border-radius: 2px;
+}
+
+.replying-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.replying-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--dim);
+}
+
+.replying-body {
+  display: block;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.replying-clear {
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--faint);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.replying-clear:hover {
+  color: var(--ink);
+  background: rgba(233, 231, 226, 0.06);
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.composer-field {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 11px 16px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--raise);
+  overflow: hidden;
+  /* transform + border-radius are animated by app.js; colour is not. */
+  will-change: transform, border-radius;
+}
+
+/* Fills left to right in proportion to how much of the limit is used, so the
+   field reports its own remaining room while you type. */
+.composer-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(233, 231, 226, 0.085) 0%, rgba(233, 231, 226, 0.02) 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer-field:focus-within {
+  border-color: var(--line-strong);
+}
+
+/* Local typing: a hairline draws itself under whatever you are writing. */
+.composer-rule {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--ink) 0%, rgba(233, 231, 226, 0.25) 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.composer textarea {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-height: 148px;
+  resize: none;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16.5px;
+  line-height: 1.5;
+}
+
+.composer textarea::placeholder {
+  color: var(--dim);
+}
+
+.composer-count {
+  flex: 0 0 auto;
+  padding-bottom: 2px;
+  font-size: 11.5px;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.composer-count.is-low {
+  color: var(--ink);
+}
+
+.send {
+  flex: 0 0 auto;
+  padding: 12px 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--void);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.send:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.send:disabled {
+  opacity: 0.22;
+  cursor: not-allowed;
+}
+
+/* ---------- 11. Typing ---------- */
+
+.typing {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.typing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 11px 15px;
+  border: 1px solid var(--line);
+  border-radius: 4px 14px 14px 14px;
+  background: var(--raise);
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dim);
+  will-change: transform, opacity;
+}
+
+.typing-who {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+/* ---------- 12. Sheets + toast ---------- */
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 6, 7, 0.82);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.veil[hidden] {
+  display: none;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 372px;
+  padding: 26px;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: var(--raise-2);
+}
+
+.sheet h2 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.sheet-note {
+  margin: 5px 0 18px;
+  font-size: 12.5px;
+  color: var(--dim);
+}
+
+.sheet input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;
+  outline: none;
+}
+
+.sheet input:focus {
+  border-color: var(--line-strong);
+}
+
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.ghost,
+.solid {
+  padding: 10px 19px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghost {
+  background: none;
+  color: var(--dim);
+}
+
+.ghost:hover {
+  color: var(--ink);
+}
+
+.solid {
+  background: var(--ink);
+  color: var(--void);
+}
+
+.solid:disabled {
+  opacity: 0.24;
+  cursor: not-allowed;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  z-index: 40;
+  margin-left: -140px;
+  width: 280px;
+  padding: 11px 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  background: var(--raise-2);
+  color: var(--dim);
+  font-size: 13px;
+  text-align: center;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+/* ---------- 13. Responsive ---------- */
+
+@media (max-width: 860px) {
+  .room-head,
+  .thread,
+  .dock {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .room-head h1 {
+    font-size: 25px;
+  }
+
+  .msg.is-mine .msg-main {
+    max-width: none;
+  }
+}
+
+@media (max-width: 660px) {
+  .rail {
+    width: 66px;
+    flex: 0 0 66px;
+    padding: 20px 9px 16px;
+  }
+
+  .wordmark,
+  .who-name,
+  .group-tally,
+  .add:not(:hover) {
+    font-size: 0;
+  }
+
+  .wordmark::after {
+    content: 'C';
+    font-size: 22px;
+  }
+
+  .group {
+    justify-content: center;
+    padding: 9px 4px;
+  }
+
+  .group::before {
+    display: none;
+  }
+
+  .group.is-active {
+    background: rgba(233, 231, 226, 0.07);
+  }
+
+  .add {
+    padding: 14px 0;
+  }
+
+  .room-head,
+  .thread,
+  .dock {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .msg {
+    grid-template-columns: 1fr;
+  }
+
+  .msg-mark {
+    display: none;
+  }
+
+  .msg.is-mine {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- 14. Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mote,
+  .wisp,
+  .typing-dot,
+  .composer-rule {
+    will-change: auto;
+  }
+
+  .thread {
+    scroll-behavior: auto;
+  }
+}
